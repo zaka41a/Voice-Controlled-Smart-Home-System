@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#142f2d">
+  <meta name="description" content="Configurez et testez votre maison connectée avec VoiceHome, le prototype local de commande vocale.">
+  <title>VoiceHome — Votre espace de contrôle</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='12' fill='%23142f2d'/%3E%3Cpath d='M10 16v8m7-14v20m7-17v14m7-10v6' stroke='%23bcf4a7' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <svg class="icon-library" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <symbol id="i-home" viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1Z"/></symbol>
+    <symbol id="i-devices" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></symbol>
+    <symbol id="i-command" viewBox="0 0 24 24"><path d="M4 9v6m4-11v16m4-13v10m4-7v4m4-8v12"/></symbol>
+    <symbol id="i-activity" viewBox="0 0 24 24"><path d="M3 12h4l3-8 4 16 3-8h4"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol>
+    <symbol id="i-power" viewBox="0 0 24 24"><path d="M12 3v9m-5-7a8 8 0 1 0 10 0"/></symbol>
+    <symbol id="i-edit" viewBox="0 0 24 24"><path d="m15 5 4 4M4 20l5-1L20 8a2.8 2.8 0 0 0-4-4L5 15Z"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M6 18 18 6"/></symbol>
+    <symbol id="i-bulb" viewBox="0 0 24 24"><path d="M9 18h6m-5 3h4m-5-6v-1a6 6 0 1 1 6 0v1Z"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+    <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 7v5h-5M4 17v-5h5m10-4a8 8 0 0 0-14-2m0 10a8 8 0 0 0 14 2"/></symbol>
+  </svg>
+
+  <aside class="sidebar">
+    <a class="brand" href="#overview" aria-label="VoiceHome, vue d’ensemble"><span class="brand-mark"><svg class="icon"><use href="#i-command"/></svg></span>voice<span class="brand-light">home</span><span class="brand-dot">.</span></a>
+    <div class="workspace"><span class="workspace-icon"><svg class="icon"><use href="#i-home"/></svg></span><div><strong>Ma maison</strong><span>Espace de développement</span></div></div>
+    <p class="nav-label">VOTRE ESPACE</p>
+    <nav aria-label="Navigation principale">
+      <button class="nav-item active" data-view="overview"><svg class="icon"><use href="#i-home"/></svg>Vue d’ensemble<span class="nav-indicator"></span></button>
+      <button class="nav-item" data-view="devices"><svg class="icon"><use href="#i-devices"/></svg>Appareils<span id="nav-device-count" class="nav-count">—</span></button>
+      <button class="nav-item" data-view="commands"><svg class="icon"><use href="#i-command"/></svg>Commandes</button>
+      <button class="nav-item" data-view="activity"><svg class="icon"><use href="#i-activity"/></svg>Activité</button>
+    </nav>
+    <div class="sidebar-bottom"><div class="simulation-note"><span class="small-dot"></span><strong>Votre laboratoire local</strong><p>Testez aujourd’hui.<br>Connectez le matériel ensuite.</p><span class="simulation-label">MODE SIMULATION</span></div><div class="profile"><span class="avatar">Z</span><div><strong>Zakaria</strong><span>Home Automation · WP2</span></div></div></div>
+  </aside>
+
+  <div class="main-shell">
+    <header class="topbar"><div class="breadcrumb">Mon espace <span>/</span> <strong id="breadcrumb-current">Vue d’ensemble</strong></div><div class="topbar-right"><span id="connection-status" class="connection"><span class="small-dot"></span>Connexion…</span><span class="topbar-divider"></span><span id="today"></span></div></header>
+    <main id="main-content">
+      <div class="page-heading"><div><div class="eyebrow">VOICEHOME / CONTROL CENTER</div><h1 id="page-title">Votre maison, en un regard.</h1><p id="page-subtitle">Un espace pour configurer, piloter et comprendre votre système.</p></div><button class="button button-dark" data-action="add-device"><svg class="icon"><use href="#i-plus"/></svg>Ajouter un appareil</button></div>
+      <div id="connection-error" class="connection-error" role="alert" hidden><div><strong>Le backend est indisponible.</strong><p>Vérifiez que l’application est démarrée, puis actualisez les données.</p></div><button class="button button-outline" data-action="refresh">Réessayer</button></div>
+
+      <section id="view-overview" class="view" aria-label="Vue d’ensemble">
+        <div class="stats-grid">
+          <div class="stat-card"><div class="stat-icon"><svg class="icon"><use href="#i-devices"/></svg></div><div><span>Appareils configurés</span><strong id="stat-devices">—</strong></div><span class="stat-detail">dans votre espace</span></div>
+          <div class="stat-card"><div class="stat-icon mint"><svg class="icon"><use href="#i-power"/></svg></div><div><span>Appareils allumés</span><strong id="stat-on">—</strong></div><span class="stat-detail">état simulé confirmé</span></div>
+          <div class="stat-card"><div class="stat-icon lavender"><svg class="icon"><use href="#i-command"/></svg></div><div><span>Commandes associées</span><strong id="stat-mappings">—</strong></div><button class="text-link" data-view="commands">Configurer <span>↗</span></button></div>
+        </div>
+
+        <div class="overview-grid">
+          <section class="command-panel" aria-labelledby="command-panel-title"><div class="panel-overline"><span class="pill pill-green"><span class="small-dot"></span>COMMANDE DE TEST</span><svg class="icon"><use href="#i-command"/></svg></div><h2 id="command-panel-title">De la commande<br>à l’action.</h2><p class="command-description">Simulez le résultat de la reconnaissance vocale et observez la réponse de votre système.</p><form id="command-form"><label for="test-command">Commande reconnue</label><div class="select-wrap"><select id="test-command" required aria-describedby="command-selection-hint"><option value="">Chargement…</option></select></div><div id="command-selection-hint" class="field-hint">Les associations déterminent l’appareil et l’action.</div><div class="confidence-label"><label for="confidence">Confiance simulée</label><output id="confidence-value" for="confidence">95 %</output></div><input id="confidence" type="range" min="0" max="100" value="95" step="1"><div class="range-hints"><span>0 %</span><span id="confidence-threshold">Seuil de démonstration : —</span><span>100 %</span></div><button id="send-command" type="submit" class="button button-lime">Envoyer la commande<svg class="icon"><use href="#i-arrow"/></svg></button></form><div class="panel-footnote">Aucun microphone ni appareil réel n’est utilisé.</div></section>
+
+          <section class="result-panel" aria-labelledby="result-panel-title"><div class="section-title"><h2 id="result-panel-title">Le système vous répond</h2><span class="pill pill-neutral">EN DIRECT</span></div><div id="command-result" class="command-result" aria-live="polite"><div class="result-illustration"><div class="orbit orbit-one"></div><div class="orbit orbit-two"></div><div class="bulb-circle"><svg class="icon"><use href="#i-bulb"/></svg></div><span class="orbit-dot dot-one"></span><span class="orbit-dot dot-two"></span></div><h3>Prêt pour le premier essai.</h3><p>Envoyez une commande. Son résultat et l’état disponible de l’appareil apparaîtront ici.</p></div><div class="flow-strip"><span><i>01</i>Reconnaissance simulée</span><span class="flow-arrow">→</span><span><i>02</i>Validation</span><span class="flow-arrow">→</span><span><i>03</i>Contrôle</span></div></section>
+        </div>
+
+        <section class="devices-section"><div class="section-title"><div><h2>Vos appareils</h2><p>Leur état, sans ambiguïté.</p></div><button class="text-link" data-view="devices">Tous les appareils <svg class="icon"><use href="#i-arrow"/></svg></button></div><div id="overview-devices" class="devices-grid"><div class="loading-placeholder">Chargement des appareils…</div></div></section>
+        <section class="activity-section"><div class="section-title"><div><h2>Dernière activité</h2><p>Les résultats réels de vos essais simulés.</p></div><button class="text-link" data-view="activity">Voir le journal <svg class="icon"><use href="#i-arrow"/></svg></button></div><div id="overview-activity"></div></section>
+      </section>
+
+      <section id="view-devices" class="view" aria-label="Appareils" hidden><div class="info-strip"><svg class="icon"><use href="#i-bulb"/></svg><p>Chaque appareil est simulé. Modifiez son comportement pour tester une confirmation, une absence de confirmation ou une indisponibilité.</p></div><div id="all-devices" class="devices-grid"></div></section>
+
+      <section id="view-commands" class="view" aria-label="Commandes" hidden><div class="section-title"><div><h2>Associations de commandes</h2><p>Un identifiant reconnu, un appareil, une action explicite.</p></div><button class="button button-dark" data-action="add-mapping"><svg class="icon"><use href="#i-plus"/></svg>Nouvelle association</button></div><div id="mappings-table" class="table-container"></div><div class="info-strip"><svg class="icon"><use href="#i-command"/></svg><p>Ces identifiants seront à convenir avec Saad. Pour le moment, les essais du tableau de bord remplacent la sortie de son modèle.</p></div></section>
+
+      <section id="view-activity" class="view" aria-label="Activité" hidden><div class="section-title"><div><h2>Journal des commandes</h2><p>Les 100 derniers essais de la session. Les résultats ne sont pas conservés après un redémarrage.</p></div><button class="button button-outline" data-action="refresh"><svg class="icon"><use href="#i-refresh"/></svg>Actualiser</button></div><div id="all-activity"></div></section>
+      <footer class="page-footer"><span><span class="small-dot"></span>Un prototype local, des résultats observables.</span><span>VoiceHome · Bachelorarbeit 2026</span></footer>
+    </main>
+  </div>
+
+  <dialog id="device-dialog" aria-labelledby="device-dialog-title"><form id="device-form"><div class="dialog-heading"><div><span class="eyebrow">VOTRE ESPACE</span><h2 id="device-dialog-title">Ajouter un appareil</h2></div><button type="button" class="icon-button" data-close="device-dialog" aria-label="Fermer"><svg class="icon"><use href="#i-close"/></svg></button></div><p class="dialog-description">Configurez un appareil virtuel pour préparer l’intégration matérielle.</p><label for="device-name">Nom de l’appareil</label><input id="device-name" name="name" maxlength="80" placeholder="Lampe du bureau" required><div class="form-row"><div><label for="device-id">Identifiant</label><input id="device-id" name="id" pattern="[a-z0-9][a-z0-9\-]{0,47}" maxlength="48" placeholder="desk-light" required><span class="field-hint">Minuscules, chiffres et tirets.</span></div><div><label for="device-room">Pièce</label><input id="device-room" name="room" maxlength="60" placeholder="Bureau" required></div></div><label for="device-mode">Comportement simulé</label><select id="device-mode" name="simulationMode"><option value="CONFIRMED">Répond et confirme son état</option><option value="UNCONFIRMED">Reçoit l’ordre, sans confirmer l’état</option><option value="OFFLINE">Indisponible : l’action échoue</option></select><p id="device-form-error" class="form-error" role="alert" hidden></p><div class="dialog-actions"><button type="button" class="button button-outline" data-close="device-dialog">Annuler</button><button type="submit" class="button button-dark">Enregistrer l’appareil</button></div></form></dialog>
+
+  <dialog id="mapping-dialog" aria-labelledby="mapping-dialog-title"><form id="mapping-form"><div class="dialog-heading"><div><span class="eyebrow">COMMANDES</span><h2 id="mapping-dialog-title">Nouvelle association</h2></div><button type="button" class="icon-button" data-close="mapping-dialog" aria-label="Fermer"><svg class="icon"><use href="#i-close"/></svg></button></div><p class="dialog-description">Définissez l’action à effectuer lorsqu’une commande est reconnue.</p><label for="mapping-id">Identifiant de commande</label><input id="mapping-id" name="commandId" pattern="[A-Z][A-Z0-9_]{0,47}" maxlength="48" placeholder="DESK_LIGHT_ON" required><span class="field-hint">Majuscules, chiffres et underscores. Exemple : LIGHT_ON.</span><label for="mapping-device">Appareil cible</label><select id="mapping-device" name="deviceId" required></select><label for="mapping-action">Action</label><select id="mapping-action" name="action"><option value="ON">Allumer — ON</option><option value="OFF">Éteindre — OFF</option></select><p id="mapping-form-error" class="form-error" role="alert" hidden></p><div class="dialog-actions"><button type="button" class="button button-outline" data-close="mapping-dialog">Annuler</button><button type="submit" class="button button-dark">Enregistrer l’association</button></div></form></dialog>
+
+  <dialog id="confirm-dialog" aria-labelledby="confirm-title"><form id="confirm-form"><div class="dialog-heading"><h2 id="confirm-title">Supprimer cet élément ?</h2><button type="button" class="icon-button" data-close="confirm-dialog" aria-label="Fermer"><svg class="icon"><use href="#i-close"/></svg></button></div><p id="confirm-description" class="dialog-description"></p><p id="confirm-error" class="form-error" role="alert" hidden></p><div class="dialog-actions"><button type="button" class="button button-outline" data-close="confirm-dialog">Annuler</button><button type="submit" class="button button-danger">Supprimer</button></div></form></dialog>
+
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+</body>
+</html>
