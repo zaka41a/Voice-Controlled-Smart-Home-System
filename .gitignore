@@ -1,0 +1,6 @@
+.DS_Store
+backend/target/
+data/
+backend/data/
+.local/
+*.log
