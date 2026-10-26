@@ -4,3 +4,9 @@ data/
 backend/data/
 .local/
 *.log
+frontend/node_modules/
+frontend/dist/
+frontend/*.tsbuildinfo
+frontend/coverage/
+frontend/test-results/
+dist/
