@@ -11,7 +11,7 @@ import tools.jackson.databind.json.JsonMapper;
 import de.fhaachen.voicehome.domain.HomeModel.Configuration;
 
 /** Persists configuration only. Runtime observations must not survive as fresh device states. */
-public final class ConfigurationStore {
+public final class ConfigurationStore implements ConfigurationRepository {
     private final Path file;
     private final JsonMapper mapper = JsonMapper.builder().build();
 
@@ -26,7 +26,7 @@ public final class ConfigurationStore {
         try {
             return Optional.of(mapper.readValue(Files.readString(file), Configuration.class));
         } catch (IOException exception) {
-            throw new UncheckedIOException("Impossible de lire la configuration : " + file, exception);
+            throw new UncheckedIOException("Cannot read configuration: " + file, exception);
         }
     }
 
@@ -42,7 +42,7 @@ public final class ConfigurationStore {
                 Files.move(temporary, file, StandardCopyOption.REPLACE_EXISTING);
             }
         } catch (IOException exception) {
-            throw new UncheckedIOException("Impossible d’enregistrer la configuration.", exception);
+            throw new UncheckedIOException("Cannot save configuration.", exception);
         } finally {
             if (temporary != null) {
                 try { Files.deleteIfExists(temporary); } catch (IOException ignored) { /* Preserve original error. */ }
