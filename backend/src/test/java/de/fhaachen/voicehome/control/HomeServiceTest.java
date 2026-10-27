@@ -85,12 +85,12 @@ class HomeServiceTest {
     void referencedDeviceCannotBeDeletedAndUnknownTargetsCannotBeConfigured() {
         assertThatThrownBy(() -> service.deleteDevice("living-room-light")).isInstanceOf(HomeService.Conflict.class);
         assertThatThrownBy(() -> service.putMapping(new Mapping("OTHER_ON", "missing", Action.ON))).isInstanceOf(IllegalArgumentException.class);
-        assertThat(service.listDevices()).hasSize(1);
-        assertThat(service.listMappings()).hasSize(2);
+        assertThat(service.getDevice("living-room-light").id()).isEqualTo("living-room-light");
+        assertThat(service.listMappings()).anyMatch(mapping -> mapping.commandId().equals("LIGHT_ON"));
         service.deleteMapping("LIGHT_ON");
         service.deleteMapping("LIGHT_OFF");
         service.deleteDevice("living-room-light");
-        assertThat(service.listDevices()).isEmpty();
+        assertThat(service.listDevices()).noneMatch(device -> device.id().equals("living-room-light"));
     }
 
     @Test
@@ -114,6 +114,34 @@ class HomeServiceTest {
         assertThat(service.dashboard().events()).hasSize(100);
         assertThat(service.dashboard().events().getFirst().commandId()).isEqualTo("UNKNOWN_109");
         assertThat(service.dashboard().events().getLast().commandId()).isEqualTo("UNKNOWN_10");
+    }
+
+    @Test
+    void allSixCommandsProduceTheExpectedDeviceStates() {
+        String[] commands = {"DOOR_OPEN", "DOOR_CLOSE", "WINDOW_OPEN", "WINDOW_CLOSE", "LIGHT_ON", "LIGHT_OFF"};
+        State[] states = {State.OPEN, State.CLOSED, State.OPEN, State.CLOSED, State.ON, State.OFF};
+        for (int index = 0; index < commands.length; index++) {
+            CommandResult result = service.handle(new RecognizedCommand(commands[index], .95));
+            assertThat(result.outcome()).as(commands[index]).isEqualTo(Outcome.CONFIRMED);
+            assertThat(result.requestedState()).isEqualTo(states[index]);
+            assertThat(result.reportedState()).isEqualTo(states[index]);
+            assertThat(service.getDevice(result.deviceId()).reportedState()).isEqualTo(states[index]);
+        }
+        assertThat(gateway.calls).isEqualTo(6);
+    }
+
+    @Test
+    void incompatibleMappingsAndDeviceTypeChangesAreRejected() {
+        assertThatThrownBy(() -> service.putMapping(new Mapping("DOOR_OPEN", "living-room-light", Action.ON)))
+                .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> service.putMapping(new Mapping("LIGHT_ON", "front-door", Action.OPEN)))
+                .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> service.putMapping(new Mapping("DOOR_CLOSE", "front-door", Action.ON)))
+                .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> service.putDevice(new Device("front-door", "Door", "Entrance", SimulationMode.CONFIRMED, DeviceType.LIGHT)))
+                .isInstanceOf(IllegalArgumentException.class);
+        assertThat(service.getDevice("front-door").type()).isEqualTo(DeviceType.DOOR);
+        assertThat(gateway.calls).isZero();
     }
 
     static final class CountingGateway implements DeviceGateway {

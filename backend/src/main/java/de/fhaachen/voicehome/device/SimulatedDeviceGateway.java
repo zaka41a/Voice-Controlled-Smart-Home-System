@@ -16,22 +16,27 @@ public final class SimulatedDeviceGateway implements DeviceGateway {
     public synchronized Actuation execute(Device device, Action action) {
         if (device.simulationMode() == SimulationMode.OFFLINE) {
             return new Actuation(Outcome.FAILED, State.UNKNOWN,
-                    "L’appareil simulé est indisponible. Aucune action n’a été effectuée.");
+                    "The simulated device is unavailable. No action was performed.");
         }
-        State target = State.valueOf(action.name());
+        State target = action.targetState();
         states.put(device.id(), target);
         if (device.simulationMode() == SimulationMode.UNCONFIRMED) {
             return new Actuation(Outcome.UNCONFIRMED, State.UNKNOWN,
-                    "Commande transmise au simulateur, sans confirmation de l’état.");
+                    "Command delivered to the simulator. Device state is unconfirmed.");
         }
-        return new Actuation(Outcome.CONFIRMED, target,
-                target == State.ON ? "Allumage confirmé par le simulateur." : "Extinction confirmée par le simulateur.");
+        return new Actuation(Outcome.CONFIRMED, target, switch (target) {
+            case ON -> "The simulated device is on.";
+            case OFF -> "The simulated device is off.";
+            case OPEN -> "The simulated device is open.";
+            case CLOSED -> "The simulated device is closed.";
+            default -> "The simulated device state is unknown.";
+        });
     }
 
     @Override
     public synchronized State readState(Device device) {
         return device.simulationMode() == SimulationMode.CONFIRMED
-                ? states.getOrDefault(device.id(), State.OFF) : State.UNKNOWN;
+                ? states.getOrDefault(device.id(), device.type().initialState()) : State.UNKNOWN;
     }
 
     @Override
