@@ -10,8 +10,9 @@ import de.fhaachen.voicehome.domain.HomeModel.Mapping;
 @RestController
 @RequestMapping("/api")
 public class HomeController {
-    public record DeviceInput(String name, String room, SimulationMode simulationMode) { }
+    public record DeviceInput(String name, String room, SimulationMode simulationMode, DeviceType type) { }
     public record MappingInput(String deviceId, Action action) { }
+    public record ReadNotificationsInput(List<String> ids) { }
     private final HomeService service;
 
     public HomeController(HomeService service) { this.service = service; }
@@ -27,7 +28,8 @@ public class HomeController {
 
     @PutMapping("/devices/{id}")
     public DeviceView configureDevice(@PathVariable String id, @RequestBody DeviceInput input) {
-        return service.putDevice(new Device(id, input.name(), input.room(), input.simulationMode()));
+        if (input.type() == null) { throw new HomeService.InvalidInput("type", "Select a device type."); }
+        return service.putDevice(new Device(id, input.name(), input.room(), input.simulationMode(), input.type()));
     }
 
     @DeleteMapping("/devices/{id}")
@@ -48,4 +50,8 @@ public class HomeController {
 
     @PostMapping("/commands")
     public CommandResult command(@RequestBody RecognizedCommand command) { return service.handle(command); }
+
+    @PostMapping("/notifications/read")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void markRead(@RequestBody ReadNotificationsInput input) { service.markNotificationsRead(input.ids()); }
 }
